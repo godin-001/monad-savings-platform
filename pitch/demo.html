@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Monad Savings — Demo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --orange:#F97316; --violet:#7C3AED; --bg:#F8F7FF;
+  --white:#fff; --gray9:#111827; --gray5:#6B7280; --gray2:#E5E7EB;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#111;overflow:hidden;height:100vh;width:100vw;}
+
+/* SCREEN WRAPPER */
+.screen{
+  position:absolute;inset:0;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.8s ease;
+}
+.screen.active{opacity:1;pointer-events:all;}
+
+/* ── SCREEN 1: HERO ── */
+#s1{background:var(--bg);display:flex;flex-direction:column;}
+.nav-bar{
+  background:white;border-bottom:1px solid var(--gray2);
+  padding:1rem 2.5rem;display:flex;justify-content:space-between;align-items:center;
+  box-shadow:0 1px 3px rgba(0,0,0,.06);
+}
+.logo{display:flex;align-items:center;gap:.6rem;}
+.logo-circle{
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,#FB923C,#7C3AED);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;color:white;font-size:.9rem;
+}
+.logo span{font-weight:700;font-size:1.05rem;}
+.cta-btn{background:#F97316;color:white;padding:.55rem 1.2rem;border-radius:.6rem;font-weight:700;font-size:.85rem;border:none;cursor:pointer;}
+
+.hero-wrap{flex:1;display:flex;align-items:center;max-width:1100px;margin:0 auto;padding:3rem 2.5rem;gap:4rem;}
+.hero-left{flex:1;}
+.eyebrow-pill{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:#FFF7ED;border:1px solid #FED7AA;border-radius:999px;
+  padding:.4rem 1rem;font-size:.8rem;color:#EA580C;font-weight:600;margin-bottom:1.5rem;
+}
+.dot-pulse{width:8px;height:8px;border-radius:50%;background:#F97316;animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(.8);}}
+
+h1.hero-h{font-size:clamp(2.5rem,5.5vw,4.5rem);font-weight:900;line-height:1.0;letter-spacing:-.03em;color:var(--gray9);}
+.hero-h .big-num{
+  background:linear-gradient(135deg,#F97316,#FB923C);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero-h .sub-line{color:#9CA3AF;font-size:clamp(1.8rem,3.5vw,3rem);}
+.hero-sub{color:var(--gray5);margin:1rem 0 .5rem;font-size:1rem;line-height:1.6;max-width:460px;}
+.trust-line{font-size:.78rem;color:#9CA3AF;margin-bottom:1.5rem;}
+.btns{display:flex;gap:.75rem;}
+.btn-main{background:#F97316;color:white;padding:.8rem 1.6rem;border-radius:.8rem;font-weight:700;font-size:.95rem;border:none;cursor:pointer;box-shadow:0 6px 20px rgba(249,115,22,.3);}
+.btn-sec{border:1px solid var(--gray2);background:white;color:var(--gray5);padding:.8rem 1.6rem;border-radius:.8rem;font-weight:600;font-size:.95rem;cursor:pointer;}
+.stats-row{display:flex;gap:2rem;margin-top:2rem;}
+.stat-num{font-size:1.8rem;font-weight:900;color:#F97316;}
+.stat-lbl{font-size:.72rem;color:#9CA3AF;}
+
+/* PHONE MOCKUP */
+.phone{width:240px;flex-shrink:0;}
+.phone-body{
+  background:white;border-radius:2rem;box-shadow:0 20px 60px rgba(0,0,0,.12);
+  border:1px solid #E5E7EB;overflow:hidden;
+}
+.phone-header{
+  background:linear-gradient(135deg,#F97316,#7C3AED);
+  color:white;padding:1.2rem 1.2rem 1.8rem;
+}
+.ph-top{display:flex;justify-content:space-between;font-size:.65rem;margin-bottom:.8rem;opacity:.8;}
+.ph-balance-lbl{font-size:.7rem;opacity:.7;margin-bottom:.2rem;}
+.ph-balance{font-size:2rem;font-weight:900;}
+.ph-gain{font-size:.72rem;opacity:.75;margin-top:.2rem;}
+.phone-content{padding:.8rem;}
+.ph-card{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:.6rem .8rem;border-radius:.75rem;margin-bottom:.5rem;
+}
+.ph-card.g{background:#F0FDF4;} .ph-card.v{background:#EDE9FE;} .ph-card.o{background:#FFF7ED;}
+.ph-label{font-size:.72rem;font-weight:600;color:#374151;}
+.ph-apy{font-size:1.1rem;font-weight:900;}
+.ph-card.g .ph-apy{color:#22C55E;} .ph-card.v .ph-apy{color:#7C3AED;} .ph-card.o .ph-apy{color:#F97316;}
+.ph-streak{display:flex;align-items:center;gap:.4rem;background:#FFF7ED;border:1px solid #FED7AA;border-radius:.7rem;padding:.5rem .8rem;font-size:.72rem;color:#EA580C;font-weight:600;margin-bottom:.6rem;}
+.ph-deposit{background:#F97316;color:white;text-align:center;padding:.65rem;border-radius:.7rem;font-size:.8rem;font-weight:700;}
+.ph-indicator{display:flex;justify-content:center;padding:.6rem;}
+.ph-bar{width:50px;height:4px;background:#E5E7EB;border-radius:999px;}
+
+/* ── SCREEN 2: APY ── */
+#s2{background:var(--bg);display:flex;flex-direction:column;}
+.section{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem 2.5rem;max-width:1000px;margin:0 auto;width:100%;}
+.section-title{font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:800;text-align:center;color:var(--gray9);margin-bottom:.5rem;}
+.section-sub{font-size:.9rem;color:#9CA3AF;text-align:center;margin-bottom:2.5rem;}
+.apy-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;width:100%;}
+.apy-c{border-radius:1.25rem;padding:1.5rem;text-align:center;border:2px solid transparent;}
+.apy-c.popular{transform:scale(1.05);box-shadow:0 12px 40px rgba(124,58,237,.2);border-color:#A78BFA;background:#F5F3FF;}
+.apy-c.green{background:#F0FDF4;border-color:#86EFAC;}
+.apy-c.orange{background:#FFF7ED;border-color:#FD8A4B;}
+.apy-c .icon{font-size:2rem;margin-bottom:.4rem;}
+.apy-c .days{font-size:.72rem;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.2rem;}
+.apy-c .rate{font-size:3.5rem;font-weight:900;line-height:1;}
+.apy-c.green .rate{color:#22C55E;} .apy-c.popular .rate{color:#7C3AED;} .apy-c.orange .rate{color:#F97316;}
+.apy-c .note{font-size:.72rem;color:#9CA3AF;margin-top:.4rem;}
+.pop-badge{position:relative;}
+.pop-badge::before{content:'MÁS POPULAR';position:absolute;top:-2.5rem;left:50%;transform:translateX(-50%);background:#7C3AED;color:white;font-size:.65rem;font-weight:700;padding:.25rem .8rem;border-radius:999px;white-space:nowrap;}
+.example-box{margin-top:2rem;background:white;border:1px solid var(--gray2);border-radius:1.25rem;padding:1.2rem 1.5rem;max-width:460px;width:100%;}
+.ex-row{display:flex;justify-content:space-between;font-size:.85rem;color:var(--gray5);padding:.3rem 0;border-bottom:1px solid #F3F4F6;}
+.ex-row:last-child{border:none;font-weight:700;font-size:.95rem;color:var(--gray9);}
+.ex-row span:last-child{font-weight:600;}
+
+/* ── SCREEN 3: DASHBOARD ── */
+#s3{background:var(--bg);display:flex;flex-direction:column;}
+.dash-nav{background:white;border-bottom:1px solid var(--gray2);padding:.9rem 2rem;display:flex;justify-content:space-between;align-items:center;}
+.dash-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;padding:1.5rem 2rem;}
+.stat-card{background:white;border:1px solid var(--gray2);border-radius:1rem;padding:1rem 1.2rem;}
+.stat-card .lbl{font-size:.72rem;color:#9CA3AF;margin-bottom:.2rem;}
+.stat-card .val{font-size:1.4rem;font-weight:800;color:var(--gray9);}
+.stat-card .val.orange{color:#F97316;} .stat-card .val.violet{color:#7C3AED;}
+
+.deposit-area{padding:0 2rem;display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;}
+.form-card{background:white;border:1px solid var(--gray2);border-radius:1.25rem;padding:1.5rem;}
+.form-card h3{font-size:1rem;font-weight:700;margin-bottom:1rem;}
+.form-row{margin-bottom:.8rem;}
+.form-label{font-size:.75rem;color:var(--gray5);margin-bottom:.3rem;}
+.form-input{width:100%;border:1.5px solid var(--gray2);border-radius:.6rem;padding:.6rem .8rem;font-size:.9rem;color:var(--gray9);}
+.form-input.active{border-color:#F97316;}
+.tier-pills{display:flex;gap:.5rem;margin:.4rem 0;}
+.tier-pill{padding:.4rem .8rem;border-radius:.6rem;font-size:.75rem;font-weight:700;cursor:pointer;border:1.5px solid transparent;}
+.tier-pill.sel-g{background:#F0FDF4;border-color:#86EFAC;color:#16A34A;}
+.tier-pill.sel-v{background:#EDE9FE;border-color:#A78BFA;color:#7C3AED;}
+.tier-pill.sel-o{background:#FFF7ED;border-color:#FD8A4B;color:#EA580C;}
+.preview-box{background:#F8F7FF;border:1px solid #E5E7EB;border-radius:.8rem;padding:.8rem 1rem;margin:.6rem 0;font-size:.78rem;}
+.preview-row{display:flex;justify-content:space-between;padding:.2rem 0;color:var(--gray5);}
+.preview-row.total{font-weight:700;border-top:1px solid #E5E7EB;margin-top:.3rem;padding-top:.5rem;color:var(--gray9);}
+.submit-btn{width:100%;background:#F97316;color:white;padding:.75rem;border:none;border-radius:.8rem;font-weight:700;font-size:.9rem;cursor:pointer;margin-top:.6rem;}
+
+/* ── SCREEN 4: CLAIM ── */
+#s4{background:var(--bg);display:flex;flex-direction:column;}
+.pos-area{padding:1.5rem 2rem;flex:1;}
+.pos-area h3{font-size:1.1rem;font-weight:700;margin-bottom:1rem;}
+.pos-table{width:100%;border-collapse:collapse;background:white;border-radius:1rem;overflow:hidden;border:1px solid var(--gray2);}
+.pos-table th{padding:.7rem 1rem;text-align:left;font-size:.75rem;color:#9CA3AF;font-weight:600;background:#FAFAFA;border-bottom:1px solid var(--gray2);}
+.pos-table td{padding:.8rem 1rem;font-size:.85rem;color:var(--gray9);border-bottom:1px solid #F3F4F6;}
+.pos-table tr:last-child td{border:none;}
+.badge{padding:.2rem .6rem;border-radius:999px;font-size:.7rem;font-weight:700;}
+.badge-v{background:#EDE9FE;color:#7C3AED;} .badge-o{background:#FFF7ED;color:#EA580C;}
+.claim-btn{background:#F97316;color:white;border:none;padding:.4rem 1rem;border-radius:.6rem;font-size:.8rem;font-weight:700;cursor:pointer;}
+.claim-btn.done{background:#22C55E;}
+
+/* ── PROGRESS BAR ── */
+.progress-bar{
+  position:fixed;bottom:0;left:0;right:0;height:4px;background:rgba(255,255,255,.15);
+  z-index:999;
+}
+.progress-fill{height:100%;background:linear-gradient(90deg,#F97316,#7C3AED);width:0%;transition:width .1s linear;}
+
+/* LABEL */
+.screen-label{
+  position:fixed;top:1.5rem;left:50%;transform:translateX(-50%);
+  background:rgba(0,0,0,.65);color:white;padding:.4rem 1.2rem;border-radius:999px;
+  font-size:.8rem;font-weight:600;z-index:999;backdrop-filter:blur(8px);
+  pointer-events:none;
+}
+</style>
+</head>
+<body>
+
+<!-- PROGRESS -->
+<div class="progress-bar"><div class="progress-fill" id="prog"></div></div>
+<div class="screen-label" id="label">1 de 4 — Landing page</div>
+
+<!-- ══ SCREEN 1: HERO ══ -->
+<div class="screen active" id="s1">
+  <div class="nav-bar">
+    <div class="logo">
+      <div class="logo-circle">M</div>
+      <span>Monad Savings</span>
+    </div>
+    <button class="cta-btn">Empieza a ahorrar →</button>
+  </div>
+  <div class="hero-wrap">
+    <div class="hero-left">
+      <div class="eyebrow-pill">
+        <span class="dot-pulse"></span>
+        Para los que ya no confían en las instituciones
+      </div>
+      <h1 class="hero-h">
+        Gana hasta <span class="big-num">20%</span> al año.<br/>
+        <span class="sub-line">Sin banco. Sin trampa.</span>
+      </h1>
+      <p class="hero-sub">
+        Deposita, elige tu plazo y recibe tu dinero con rendimiento al vencer.
+        Las reglas están en el contrato — públicas, inmutables, verificables.
+      </p>
+      <p class="trust-line">✓ Sin comisiones ocultas &nbsp;·&nbsp; ✓ Sin historial crediticio &nbsp;·&nbsp; ✓ Sin mínimos</p>
+      <div class="btns">
+        <button class="btn-main">Empieza con lo que tengas →</button>
+        <button class="btn-sec">Ver el contrato</button>
+      </div>
+      <div class="stats-row">
+        <div><div class="stat-num">20%</div><div class="stat-lbl">APY máximo</div></div>
+        <div><div class="stat-num">100K</div><div class="stat-lbl">mUSDC en pool</div></div>
+        <div><div class="stat-num">0</div><div class="stat-lbl">comisiones ocultas</div></div>
+      </div>
+    </div>
+    <!-- PHONE -->
+    <div class="phone">
+      <div class="phone-body">
+        <div class="phone-header">
+          <div class="ph-top"><span>Monad Savings</span><span>🔋 92%</span></div>
+          <div class="ph-balance-lbl">Balance disponible</div>
+          <div class="ph-balance">$5,221.92</div>
+          <div class="ph-gain">+$221.92 esta semana 📈</div>
+        </div>
+        <div class="phone-content">
+          <div class="ph-card g"><div><div class="ph-label">🌱 30 días</div></div><div class="ph-apy">5%</div></div>
+          <div class="ph-card v"><div><div class="ph-label">🔥 60 días</div></div><div class="ph-apy">12%</div></div>
+          <div class="ph-card o"><div><div class="ph-label">💎 90 días</div></div><div class="ph-apy">20%</div></div>
+          <div style="height:.5rem"></div>
+          <div class="ph-streak">🔥 Racha: 7 depósitos seguidos</div>
+          <div class="ph-deposit">Depositar ahora →</div>
+          <div class="ph-indicator"><div class="ph-bar"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 2: APY TIERS ══ -->
+<div class="screen" id="s2">
+  <div class="nav-bar">
+    <div class="logo"><div class="logo-circle">M</div><span>Monad Savings</span></div>
+    <button class="cta-btn">Empieza a ahorrar →</button>
+  </div>
+  <div class="section">
+    <div class="section-title">Elige cuánto tiempo y cuánto ganas</div>
+    <div class="section-sub">La tasa es fija y está grabada en el contrato. Lo que ves es lo que recibes.</div>
+    <div class="apy-grid">
+      <div class="apy-c green">
+        <div class="icon">🌱</div>
+        <div class="days">1 mes</div>
+        <div class="rate">5%</div>
+        <div class="note">"Para empezar"</div>
+      </div>
+      <div class="apy-c popular pop-badge">
+        <div class="icon">🔥</div>
+        <div class="days">2 meses</div>
+        <div class="rate">12%</div>
+        <div class="note">"El más popular"</div>
+      </div>
+      <div class="apy-c orange">
+        <div class="icon">💎</div>
+        <div class="days">3 meses</div>
+        <div class="rate">20%</div>
+        <div class="note">"Máximo rendimiento"</div>
+      </div>
+    </div>
+    <div class="example-box">
+      <div class="ex-row"><span>💡 $5,000 pesos a 90 días</span></div>
+      <div class="ex-row"><span>Rendimiento bruto (20% APY)</span><span style="color:#16A34A">+$246.57</span></div>
+      <div class="ex-row"><span>Comisión protocolo (10% yield)</span><span style="color:#F97316">−$24.65</span></div>
+      <div class="ex-row"><span>Recibes al vencer</span><span style="color:#7C3AED">$5,221.92 ✅</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 3: DEPOSIT FORM ══ -->
+<div class="screen" id="s3">
+  <div class="dash-nav">
+    <div class="logo"><div class="logo-circle">M</div><span>Dashboard</span></div>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <span style="font-size:.8rem;background:#FFF7ED;border:1px solid #FED7AA;border-radius:999px;padding:.3rem .8rem;color:#EA580C;font-weight:600;">🔥 Racha: 7</span>
+      <span style="font-size:.8rem;background:#EDE9FE;border-radius:999px;padding:.3rem .9rem;color:#7C3AED;font-weight:600;">0x77F0...895b</span>
+    </div>
+  </div>
+  <div class="dash-stats">
+    <div class="stat-card"><div class="lbl">Total bloqueado</div><div class="val orange">5,000 mUSDC</div></div>
+    <div class="stat-card"><div class="lbl">Posiciones activas</div><div class="val">1</div></div>
+    <div class="stat-card"><div class="lbl">Total ganado</div><div class="val violet">221.92 mUSDC</div></div>
+  </div>
+  <div class="deposit-area">
+    <div class="form-card">
+      <h3>💰 Nuevo depósito</h3>
+      <div class="form-row">
+        <div class="form-label">Monto</div>
+        <input class="form-input active" value="5000" readonly/>
+      </div>
+      <div class="form-row">
+        <div class="form-label">Plazo</div>
+        <div class="tier-pills">
+          <span class="tier-pill sel-g">🌱 30d · 5%</span>
+          <span class="tier-pill sel-v">🔥 60d · 12%</span>
+          <span class="tier-pill sel-o" style="box-shadow:0 0 0 2px #F97316;">💎 90d · 20%</span>
+        </div>
+      </div>
+      <div class="preview-box">
+        <div style="font-size:.72rem;font-weight:700;color:#374151;margin-bottom:.4rem;">Vista previa del rendimiento</div>
+        <div class="preview-row"><span>Tu depósito</span><span>5,000 mUSDC</span></div>
+        <div class="preview-row"><span>Rendimiento bruto</span><span style="color:#16A34A">+246.57</span></div>
+        <div class="preview-row"><span>Comisión protocolo (10%)</span><span style="color:#F97316">−24.65</span></div>
+        <div class="preview-row total"><span>Recibirás</span><span style="color:#7C3AED">5,221.92 mUSDC</span></div>
+      </div>
+      <button class="submit-btn">Depositar 5,000 mUSDC →</button>
+    </div>
+    <div class="form-card">
+      <h3>🎯 Meta de ahorro (opcional)</h3>
+      <div class="form-row">
+        <div class="form-label">Nombre de la meta</div>
+        <input class="form-input" value="Fondo de emergencia 🏦" readonly/>
+      </div>
+      <div class="form-row">
+        <div class="form-label">Objetivo</div>
+        <input class="form-input" value="10,000 mUSDC" readonly/>
+      </div>
+      <div style="margin-top:1rem;">
+        <div style="font-size:.75rem;color:#9CA3AF;margin-bottom:.4rem;">Progreso</div>
+        <div style="background:#F3F4F6;border-radius:999px;height:10px;overflow:hidden;">
+          <div style="width:50%;background:linear-gradient(90deg,#F97316,#FB923C);height:100%;border-radius:999px;"></div>
+        </div>
+        <div style="font-size:.72rem;color:#9CA3AF;margin-top:.3rem;">5,000 / 10,000 mUSDC — 50%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCREEN 4: CLAIM ══ -->
+<div class="screen" id="s4">
+  <div class="dash-nav">
+    <div class="logo"><div class="logo-circle">M</div><span>Dashboard — Reclamar</span></div>
+    <span style="font-size:.8rem;background:#EDE9FE;border-radius:999px;padding:.3rem .9rem;color:#7C3AED;font-weight:600;">0x77F0...895b</span>
+  </div>
+  <div class="pos-area">
+    <h3>📊 Mis posiciones</h3>
+    <table class="pos-table">
+      <thead>
+        <tr>
+          <th>Token</th><th>Depositado</th><th>Rendimiento neto</th><th>Plazo</th><th>Vence</th><th>Estado</th><th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>mUSDC</strong></td>
+          <td>5,000</td>
+          <td style="color:#16A34A;font-weight:700;">+221.92</td>
+          <td><span class="badge badge-v">💎 90d</span></td>
+          <td>26 Jun 2026</td>
+          <td><span class="badge" style="background:#DCFCE7;color:#16A34A;">✅ Listo</span></td>
+          <td><button class="claim-btn done">Reclamar 5,221.92</button></td>
+        </tr>
+        <tr>
+          <td><strong>mUSDC</strong></td>
+          <td>2,000</td>
+          <td style="color:#9CA3AF;">+117.53</td>
+          <td><span class="badge badge-o">🔥 60d</span></td>
+          <td>15 May 2026</td>
+          <td><span class="badge" style="background:#FFF7ED;color:#EA580C;">🔒 Activo</span></td>
+          <td><button class="claim-btn" style="background:#E5E7EB;color:#9CA3AF;">Pendiente</button></td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- success toast -->
+    <div id="toast" style="display:none;margin-top:1.5rem;background:#ECFDF5;border:1.5px solid #6EE7B7;border-radius:1rem;padding:1rem 1.5rem;max-width:500px;">
+      <div style="font-weight:700;color:#065F46;font-size:1rem;">🎉 ¡Reclamo exitoso!</div>
+      <div style="font-size:.85rem;color:#047857;margin-top:.3rem;">5,221.92 mUSDC enviados a tu wallet. Tx confirmada on-chain.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const screens = [
+  { id:'s1', label:'1 de 4 — Landing page',    dur:7000 },
+  { id:'s2', label:'2 de 4 — Planes de ahorro', dur:7000 },
+  { id:'s3', label:'3 de 4 — Dashboard / Depositar', dur:8000 },
+  { id:'s4', label:'4 de 4 — Reclamar',         dur:8000 },
+];
+let cur = 0;
+let startTime;
+let claimDone = false;
+
+const prog = document.getElementById('prog');
+const labelEl = document.getElementById('label');
+
+function showToast() {
+  setTimeout(() => {
+    document.getElementById('toast').style.display = 'block';
+  }, 3000);
+}
+
+function goTo(n) {
+  document.getElementById(screens[cur].id).classList.remove('active');
+  cur = n % screens.length;
+  document.getElementById(screens[cur].id).classList.add('active');
+  labelEl.textContent = screens[cur].label;
+  startTime = Date.now();
+  if (cur === 3 && !claimDone) { claimDone = true; showToast(); }
+}
+
+// Auto advance
+function tick() {
+  const elapsed = Date.now() - startTime;
+  const total   = screens[cur].dur;
+  const pct     = Math.min(elapsed / total * 100, 100);
+  prog.style.width = pct + '%';
+  if (elapsed >= total) { goTo(cur + 1); }
+  requestAnimationFrame(tick);
+}
+
+// Start
+startTime = Date.now();
+requestAnimationFrame(tick);
+
+// Click to advance
+document.addEventListener('click', () => goTo(cur + 1));
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') goTo(cur + 1);
+  if (e.key === 'ArrowLeft') goTo((cur - 1 + screens.length) % screens.length);
+});
+</script>
+</body>
+</html>
