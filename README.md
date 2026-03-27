@@ -1,106 +1,113 @@
 # Monad Savings Platform 💎
 
-> **Fixed-yield DeFi savings vault built on Monad.** Deposit tokens, choose a lock period, earn predictable APY.
+> **"En un seguro comercial confías en una empresa. Aquí confías en el código — y el código no miente."**
 
-Built for the **Monad Hackathon 2026**.
+Ahorro a plazo fijo con rendimiento transparente en Monad. Para la generación de 20–35 años que no confía en las instituciones financieras.
 
----
-
-## What is it?
-
-Monad Savings lets users:
-
-1. **Deposit** ERC20 tokens into a vault
-2. **Lock** them for 30, 60, or 90 days
-3. **Earn** fixed APY (5% / 12% / 20%)
-4. **Claim** principal + yield at maturity
-
-No impermanent loss. No complexity. Just savings.
+**Monad Hackathon 2026.**
 
 ---
 
-## APY Tiers
+## El problema
 
-| Lock Period | APY  |
-|-------------|------|
-| 30 days     | 5%   |
-| 60 days     | 12%  |
-| 90 days     | 20%  |
+Los seguros de ahorro comerciales fallan a los jóvenes de 3 maneras:
+1. **Opacos** — comisiones ocultas del 15–40%
+2. **Inflexibles** — compromisos de 5–20 años con penalizaciones
+3. **Dependientes** — confías en que la institución no cambie los términos
+
+## La solución
+
+Un vault DeFi donde las reglas son inmutables, públicas y autoejecutables.
+Sin KYC. Sin historial crediticio. Sin intermediarios. Solo el código.
 
 ---
 
-## Architecture
+## Características
+
+- **APY fijo:** 5% (30d) / 12% (60d) / 20% (90d) — grabado en el contrato
+- **Comisión transparente:** 10% del yield, visible antes de depositar
+- **Metas de ahorro on-chain:** Define para qué ahorras (ej. "Viaje a Japón: 1,200 USDC")
+- **Savings Streaks:** Tu disciplina de ahorro queda registrada en la blockchain
+- **Sin KYC:** Solo necesitas una wallet
+
+---
+
+## Stack
+
+| Capa | Tecnología |
+|------|-----------|
+| Contratos | Solidity 0.8.24, Foundry |
+| Red | Monad Testnet (Chain ID: 10143) |
+| Frontend | Next.js 14, wagmi v2, RainbowKit |
+| Estilos | Tailwind CSS (dark theme) |
+
+---
+
+## Estructura
 
 ```
 monad-savings-platform/
-├── contracts/          # Foundry project (Solidity 0.8.24)
+├── contracts/
 │   ├── src/
-│   │   ├── SavingsVault.sol    # Main vault contract
-│   │   └── MockERC20.sol       # Test token
+│   │   ├── SavingsVault.sol    # Vault principal con metas + streaks + fee
+│   │   └── MockERC20.sol       # Token de prueba
 │   ├── test/
-│   │   └── SavingsVault.t.sol  # Foundry tests
+│   │   └── SavingsVault.t.sol  # Tests Foundry (17 tests)
 │   └── script/
-│       └── Deploy.s.sol        # Deploy script
-│
-├── frontend/           # Next.js 14 + wagmi + RainbowKit
+│       └── Deploy.s.sol        # Deploy a Monad Testnet
+├── frontend/
 │   ├── app/
-│   │   ├── page.tsx            # Landing page
-│   │   └── app/page.tsx        # Main dashboard
-│   ├── components/
-│   │   ├── DepositForm.tsx
-│   │   ├── PositionsTable.tsx
-│   │   └── StatsRow.tsx
-│   └── lib/
-│       ├── wagmi.ts            # Chain + wagmi config
-│       └── contracts.ts        # ABIs + addresses
-│
-└── scripts/
-    └── deploy.sh               # One-command deploy
+│   │   ├── page.tsx            # Landing con comparativa vs seguro comercial
+│   │   └── app/page.tsx        # Dashboard: depósito, metas, posiciones
+│   └── components/
+│       ├── DepositForm.tsx     # Formulario con preview de yield neto
+│       ├── PositionsTable.tsx  # Tabla de posiciones con claim
+│       ├── GoalsSection.tsx    # Metas de ahorro on-chain
+│       └── StatsRow.tsx        # Estadísticas del usuario
+├── STRATEGY.md                 # Estrategia, diferenciadores, modelo de negocios
+└── scripts/deploy.sh           # Deploy en un comando
 ```
 
 ---
 
 ## Quick Start
 
-### 1. Contracts
+### Contratos
 
 ```bash
 cd contracts
 
-# Install dependencies
+# Instalar dependencias
 forge install foundry-rs/forge-std --no-commit
 
-# Build
+# Build + Tests
 forge build
-
-# Test
 forge test -v
 
-# Deploy to Monad Testnet
+# Deploy a Monad Testnet
 export PRIVATE_KEY=0x...
-forge script script/Deploy.s.sol \
-  --rpc-url https://testnet-rpc.monad.xyz \
-  --private-key $PRIVATE_KEY \
-  --broadcast \
-  --legacy
+bash ../scripts/deploy.sh
 ```
 
-### 2. Frontend
+### Frontend
 
 ```bash
 cd frontend
-
-# Install
 npm install
 
-# Configure (add deployed contract addresses)
-# Edit lib/contracts.ts → update CONTRACT_ADDRESSES
+# Actualizar direcciones en lib/contracts.ts
+# NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID en .env.local
 
-# Run dev server
 npm run dev
 ```
 
-Open http://localhost:3000
+---
+
+## Modelo de negocios
+
+1. **Fee de rendimiento (día 1):** 10% del yield al claim. Visible en el contrato.
+2. **Spread del yield pool (fase 2):** Fondos desplegados en lending → diferencia = margen.
+3. **Premium Features (fase 3):** NFT Streaks, plazos extendidos, API empresarial.
 
 ---
 
@@ -110,29 +117,3 @@ Open http://localhost:3000
 - **RPC:** https://testnet-rpc.monad.xyz
 - **Explorer:** https://testnet.monadexplorer.com
 - **Faucet:** https://faucet.monad.xyz
-
----
-
-## Smart Contract: SavingsVault
-
-### Key Functions
-
-| Function | Description |
-|----------|-------------|
-| `deposit(token, amount, lockPeriodDays)` | Deposit tokens, lock for 30/60/90 days |
-| `claim(positionIndex)` | Claim principal + yield after maturity |
-| `calculateYield(amount, lockPeriodDays)` | View estimated yield |
-| `getPositions(user)` | Get all positions for a user |
-| `fundYieldPool(token, amount)` | Owner: add yield pool liquidity |
-
-### Yield Formula
-
-```
-yield = (amount × apyBps × lockDays) / (365 × 10000)
-```
-
----
-
-## Team
-
-Built with ❤️ for Monad Hackathon 2026.

@@ -1,5 +1,5 @@
 // ─── Contract Addresses ───────────────────────────────────────────────────────
-// Update after deploying to Monad Testnet
+// Actualizar después del deploy en Monad Testnet
 
 export const CONTRACT_ADDRESSES = {
   savingsVault: "0x0000000000000000000000000000000000000000" as `0x${string}`,
@@ -9,7 +9,7 @@ export const CONTRACT_ADDRESSES = {
 // ─── SavingsVault ABI ─────────────────────────────────────────────────────────
 
 export const SAVINGS_VAULT_ABI = [
-  // Read functions
+  // View
   {
     name: "getPositions",
     type: "function",
@@ -26,6 +26,25 @@ export const SAVINGS_VAULT_ABI = [
           { name: "startTime", type: "uint256" },
           { name: "maturityTime", type: "uint256" },
           { name: "claimed", type: "bool" },
+          { name: "goalIndex", type: "uint256" },
+        ],
+      },
+    ],
+  },
+  {
+    name: "getGoals",
+    type: "function",
+    stateMutability: "view",
+    inputs: [{ name: "user", type: "address" }],
+    outputs: [
+      {
+        name: "",
+        type: "tuple[]",
+        components: [
+          { name: "name", type: "string" },
+          { name: "targetAmount", type: "uint256" },
+          { name: "savedAmount", type: "uint256" },
+          { name: "active", type: "bool" },
         ],
       },
     ],
@@ -41,6 +60,23 @@ export const SAVINGS_VAULT_ABI = [
     outputs: [{ name: "", type: "uint256" }],
   },
   {
+    name: "calculateNetYield",
+    type: "function",
+    stateMutability: "view",
+    inputs: [
+      { name: "amount", type: "uint256" },
+      { name: "lockPeriodDays", type: "uint256" },
+    ],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    name: "protocolFeeBps",
+    type: "function",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
     name: "yieldPool",
     type: "function",
     stateMutability: "view",
@@ -48,13 +84,13 @@ export const SAVINGS_VAULT_ABI = [
     outputs: [{ name: "", type: "uint256" }],
   },
   {
-    name: "apyBps",
+    name: "streak",
     type: "function",
     stateMutability: "view",
-    inputs: [{ name: "lockPeriodDays", type: "uint256" }],
+    inputs: [{ name: "user", type: "address" }],
     outputs: [{ name: "", type: "uint256" }],
   },
-  // Write functions
+  // Write
   {
     name: "deposit",
     type: "function",
@@ -63,6 +99,7 @@ export const SAVINGS_VAULT_ABI = [
       { name: "token", type: "address" },
       { name: "amount", type: "uint256" },
       { name: "lockPeriodDays", type: "uint256" },
+      { name: "goalIndex", type: "uint256" },
     ],
     outputs: [],
   },
@@ -72,6 +109,16 @@ export const SAVINGS_VAULT_ABI = [
     stateMutability: "nonpayable",
     inputs: [{ name: "positionIndex", type: "uint256" }],
     outputs: [],
+  },
+  {
+    name: "createGoal",
+    type: "function",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "name", type: "string" },
+      { name: "targetAmount", type: "uint256" },
+    ],
+    outputs: [{ name: "", type: "uint256" }],
   },
   // Events
   {
@@ -83,6 +130,7 @@ export const SAVINGS_VAULT_ABI = [
       { name: "amount", type: "uint256", indexed: false },
       { name: "lockPeriodDays", type: "uint256", indexed: false },
       { name: "maturityTime", type: "uint256", indexed: false },
+      { name: "goalIndex", type: "uint256", indexed: false },
     ],
   },
   {
@@ -92,12 +140,32 @@ export const SAVINGS_VAULT_ABI = [
       { name: "user", type: "address", indexed: true },
       { name: "positionIndex", type: "uint256", indexed: true },
       { name: "principal", type: "uint256", indexed: false },
-      { name: "yield", type: "uint256", indexed: false },
+      { name: "yieldAmount", type: "uint256", indexed: false },
+      { name: "protocolFee", type: "uint256", indexed: false },
+    ],
+  },
+  {
+    name: "GoalCreated",
+    type: "event",
+    inputs: [
+      { name: "user", type: "address", indexed: true },
+      { name: "goalIndex", type: "uint256", indexed: true },
+      { name: "name", type: "string", indexed: false },
+      { name: "targetAmount", type: "uint256", indexed: false },
+    ],
+  },
+  {
+    name: "GoalCompleted",
+    type: "event",
+    inputs: [
+      { name: "user", type: "address", indexed: true },
+      { name: "goalIndex", type: "uint256", indexed: true },
+      { name: "name", type: "string", indexed: false },
     ],
   },
 ] as const;
 
-// ─── ERC20 ABI (minimal) ──────────────────────────────────────────────────────
+// ─── ERC20 ABI ────────────────────────────────────────────────────────────────
 
 export const ERC20_ABI = [
   {
@@ -146,7 +214,10 @@ export const ERC20_ABI = [
 // ─── APY Config ───────────────────────────────────────────────────────────────
 
 export const APY_CONFIG = [
-  { days: 30, apy: 5, label: "1 Month", color: "text-green-400" },
-  { days: 60, apy: 12, label: "2 Months", color: "text-yellow-400" },
-  { days: 90, apy: 20, label: "3 Months", color: "text-purple-400" },
+  { days: 30,  apy: 5,  label: "1 Mes",    color: "text-green-400",  icon: "🌱" },
+  { days: 60,  apy: 12, label: "2 Meses",  color: "text-yellow-400", icon: "🔥" },
+  { days: 90,  apy: 20, label: "3 Meses",  color: "text-purple-400", icon: "💎" },
 ] as const;
+
+// Comisión del protocolo (visible en UI)
+export const PROTOCOL_FEE_PCT = 10; // 10% del yield

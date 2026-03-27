@@ -12,33 +12,33 @@ contract DeployScript is Script {
 
         vm.startBroadcast(deployerPrivateKey);
 
-        // 1. Deploy SavingsVault
-        SavingsVault vault = new SavingsVault();
+        // 1. Deploy SavingsVault (feeRecipient = deployer para demo)
+        SavingsVault vault = new SavingsVault(deployer);
         console.log("SavingsVault deployed at:", address(vault));
 
-        // 2. Deploy MockERC20 (for testnet demo)
+        // 2. Deploy MockUSDC
         MockERC20 mockToken = new MockERC20("Mock USDC", "mUSDC");
-        console.log("MockERC20 deployed at:", address(mockToken));
+        console.log("MockUSDC deployed at:", address(mockToken));
 
-        // 3. Mint tokens to deployer
+        // 3. Mint tokens al deployer
         uint256 mintAmount = 1_000_000 ether;
         mockToken.mint(deployer, mintAmount);
-        console.log("Minted", mintAmount / 1 ether, "mUSDC to deployer");
 
-        // 4. Fund yield pool with 100k tokens
+        // 4. Fondear yield pool con 100k tokens
         uint256 yieldPoolAmount = 100_000 ether;
         mockToken.approve(address(vault), yieldPoolAmount);
         vault.fundYieldPool(address(mockToken), yieldPoolAmount);
-        console.log("Funded yield pool with", yieldPoolAmount / 1 ether, "mUSDC");
+        console.log("Yield pool funded with 100,000 mUSDC");
 
         vm.stopBroadcast();
 
-        // Print summary
-        console.log("\n=== Deployment Summary ===");
-        console.log("Network:       Monad Testnet");
+        console.log("\n========== DEPLOYMENT SUMMARY ==========");
+        console.log("Network:       Monad Testnet (10143)");
         console.log("Deployer:      ", deployer);
         console.log("SavingsVault:  ", address(vault));
         console.log("MockUSDC:      ", address(mockToken));
-        console.log("==========================\n");
+        console.log("Protocol Fee:  10%% of yield (transparent)");
+        console.log("=========================================\n");
+        console.log("Next: update CONTRACT_ADDRESSES in frontend/lib/contracts.ts");
     }
 }
