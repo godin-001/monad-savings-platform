@@ -45,7 +45,7 @@ export function PositionsTable() {
 
   if (!positions || (positions as unknown as Position[]).length === 0) {
     return (
-      <div className="bg-[#13132A] border border-[#1E1E3F] rounded-2xl p-8 text-center text-gray-500">
+      <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center text-gray-500">
         <div className="text-4xl mb-3">📭</div>
         <p className="font-medium">No active positions</p>
         <p className="text-sm mt-1">Make your first deposit to start earning.</p>
@@ -54,14 +54,14 @@ export function PositionsTable() {
   }
 
   return (
-    <div className="bg-[#13132A] border border-[#1E1E3F] rounded-2xl overflow-hidden">
-      <div className="p-4 border-b border-[#1E1E3F]">
-        <h3 className="font-semibold text-gray-200">Your Positions</h3>
+    <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+      <div className="p-4 border-b border-gray-200">
+        <h3 className="font-semibold text-gray-800">Your Positions</h3>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-gray-500 text-xs uppercase tracking-wider border-b border-[#1E1E3F]">
+            <tr className="text-gray-400 text-xs uppercase tracking-wider border-b border-gray-200">
               <th className="text-left px-4 py-3">Amount</th>
               <th className="text-left px-4 py-3">Period</th>
               <th className="text-left px-4 py-3">APY</th>
@@ -70,7 +70,7 @@ export function PositionsTable() {
               <th className="text-right px-4 py-3">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#1E1E3F]">
+          <tbody className="divide-y divide-gray-100">
             {(positions as unknown as Position[]).map((pos, i) => {
               const isMatured = now >= Number(pos.maturityTime);
               const tier = APY_CONFIG.find((t) => t.days === Number(pos.lockPeriodDays));
@@ -96,15 +96,15 @@ export function PositionsTable() {
                   </td>
                   <td className="px-4 py-4">
                     {pos.claimed ? (
-                      <span className="inline-flex items-center gap-1 bg-green-900/20 text-green-400 text-xs px-2 py-1 rounded-full border border-green-800">
+                      <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full border border-green-200">
                         ✓ Claimed
                       </span>
                     ) : isMatured ? (
-                      <span className="inline-flex items-center gap-1 bg-yellow-900/20 text-yellow-400 text-xs px-2 py-1 rounded-full border border-yellow-800">
+                      <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-700 text-xs px-2 py-1 rounded-full border border-yellow-200">
                         ✨ Ready
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 bg-blue-900/20 text-blue-400 text-xs px-2 py-1 rounded-full border border-blue-800">
+                      <span className="inline-flex items-center gap-1 bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded-full border border-blue-200">
                         🔒 Locked
                       </span>
                     )}

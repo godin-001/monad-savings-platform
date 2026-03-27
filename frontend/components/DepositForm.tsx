@@ -110,7 +110,7 @@ export function DepositForm({ onSuccess }: { onSuccess?: () => void }) {
           value={tokenAddress}
           onChange={(e) => setTokenAddress(e.target.value as `0x${string}`)}
           placeholder="0x..."
-          className="w-full bg-[#0D0D1A] border border-[#1E1E3F] rounded-lg px-4 py-3 text-sm font-mono text-gray-200 focus:outline-none focus:border-purple-500 transition-colors"
+          className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm font-mono text-gray-800 focus:outline-none focus:border-purple-500 transition-colors"
         />
       </div>
 
@@ -125,9 +125,9 @@ export function DepositForm({ onSuccess }: { onSuccess?: () => void }) {
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="0.00"
-            className="w-full bg-[#0D0D1A] border border-[#1E1E3F] rounded-lg px-4 py-3 text-lg font-medium text-gray-200 focus:outline-none focus:border-purple-500 transition-colors pr-20"
+            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-lg font-medium text-gray-800 focus:outline-none focus:border-purple-500 transition-colors pr-20"
           />
-          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm">
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
             tokens
           </span>
         </div>
@@ -145,14 +145,14 @@ export function DepositForm({ onSuccess }: { onSuccess?: () => void }) {
               onClick={() => setSelectedDays(tier.days as 30 | 60 | 90)}
               className={`rounded-xl py-3 border text-center transition-all ${
                 selectedDays === tier.days
-                  ? "bg-purple-900/40 border-purple-500 text-white"
-                  : "bg-[#0D0D1A] border-[#1E1E3F] text-gray-400 hover:border-purple-500/40"
+                  ? "bg-violet-600 border-violet-600 text-white"
+                  : "bg-gray-50 border-gray-200 text-gray-400 hover:border-purple-500/40"
               }`}
             >
               <div className="text-lg">{tier.icon}</div>
               <div className="font-bold text-sm mt-0.5">{tier.days} días</div>
               <div className={`text-lg font-extrabold ${tier.color}`}>{tier.apy}%</div>
-              <div className="text-xs text-gray-500">APY</div>
+              <div className="text-xs text-gray-400">APY</div>
             </button>
           ))}
         </div>
@@ -167,7 +167,7 @@ export function DepositForm({ onSuccess }: { onSuccess?: () => void }) {
           <select
             value={selectedGoal}
             onChange={(e) => setSelectedGoal(Number(e.target.value))}
-            className="w-full bg-[#0D0D1A] border border-[#1E1E3F] rounded-lg px-4 py-3 text-sm text-gray-200 focus:outline-none focus:border-purple-500 transition-colors"
+            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-800 focus:outline-none focus:border-purple-500 transition-colors"
           >
             <option value={0}>Sin meta específica</option>
             {(goals as unknown as Goal[]).map((goal, i) =>
@@ -184,10 +184,10 @@ export function DepositForm({ onSuccess }: { onSuccess?: () => void }) {
 
       {/* Preview */}
       {amount && Number(amount) > 0 && (
-        <div className="bg-[#0D0D1A] border border-[#1E1E3F] rounded-xl p-4 space-y-2 text-sm">
+        <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-2 text-sm">
           <div className="flex justify-between text-gray-400">
             <span>Capital depositado</span>
-            <span className="text-white font-medium">{amount} tokens</span>
+            <span className="text-gray-900 font-medium">{amount} tokens</span>
           </div>
           <div className="flex justify-between text-gray-400">
             <span>Rendimiento bruto ({selectedTier.apy}% APY)</span>
@@ -210,7 +210,7 @@ export function DepositForm({ onSuccess }: { onSuccess?: () => void }) {
           </div>
           <div className="flex justify-between text-gray-400">
             <span>Vencimiento</span>
-            <span className="text-white font-medium">
+            <span className="text-gray-900 font-medium">
               {new Date(Date.now() + selectedDays * 86400000).toLocaleDateString("es-MX", {
                 day: "numeric",
                 month: "long",
@@ -218,7 +218,7 @@ export function DepositForm({ onSuccess }: { onSuccess?: () => void }) {
               })}
             </span>
           </div>
-          <div className="border-t border-[#1E1E3F] pt-2.5 flex justify-between font-semibold text-base">
+          <div className="border-t border-gray-200 pt-2.5 flex justify-between font-semibold text-base">
             <span className="text-gray-300">Recibirás al vencimiento</span>
             <span className="text-white">
               {netYieldData
@@ -227,7 +227,7 @@ export function DepositForm({ onSuccess }: { onSuccess?: () => void }) {
               tokens
             </span>
           </div>
-          <p className="text-xs text-gray-600 pt-1">
+          <p className="text-xs text-gray-400 pt-1">
             ✅ La comisión es pública e inmutable en el contrato. Sin letra pequeña.
           </p>
         </div>

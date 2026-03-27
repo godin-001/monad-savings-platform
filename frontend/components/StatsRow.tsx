@@ -64,7 +64,7 @@ export function StatsRow() {
       {stats.map((s) => (
         <div
           key={s.label}
-          className="bg-[#13132A] border border-[#1E1E3F] rounded-xl p-4 flex items-center gap-3"
+          className="bg-white border border-gray-200 rounded-xl p-4 flex items-center gap-3"
         >
           <span className="text-2xl">{s.icon}</span>
           <div>

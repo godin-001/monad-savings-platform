@@ -52,12 +52,12 @@ export function GoalsSection({ onGoalCreated }: { onGoalCreated?: () => void }) 
   const GOAL_EMOJIS = ["🎯", "✈️", "🏠", "💻", "🚗", "🎓", "💍", "🌎", "🏋️", "🎵"];
 
   return (
-    <div className="bg-[#13132A] border border-[#1E1E3F] rounded-2xl p-5">
+    <div className="bg-white border border-gray-200 rounded-2xl p-5">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-gray-200">🎯 Mis Metas</h3>
+        <h3 className="font-semibold text-gray-800">🎯 Mis Metas</h3>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="text-xs bg-purple-900/30 hover:bg-purple-900/50 border border-purple-500/30 text-purple-300 px-3 py-1.5 rounded-lg transition-colors"
+          className="text-xs bg-violet-100 hover:bg-violet-200 border border-violet-300 text-violet-700 px-3 py-1.5 rounded-lg transition-colors"
         >
           {showForm ? "Cancelar" : "+ Nueva meta"}
         </button>
@@ -65,7 +65,7 @@ export function GoalsSection({ onGoalCreated }: { onGoalCreated?: () => void }) 
 
       {/* Formulario nueva meta */}
       {showForm && (
-        <div className="bg-[#0D0D1A] border border-[#1E1E3F] rounded-xl p-4 mb-4 space-y-3">
+        <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4 space-y-3">
           <div>
             <label className="text-xs text-gray-500 mb-1 block">Nombre de la meta</label>
             <input
@@ -73,7 +73,7 @@ export function GoalsSection({ onGoalCreated }: { onGoalCreated?: () => void }) 
               value={goalName}
               onChange={(e) => setGoalName(e.target.value)}
               placeholder='ej. "Viaje a Japón", "Fondo de emergencia"'
-              className="w-full bg-[#0D0D1A] border border-[#1E1E3F] rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-purple-500"
+              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-purple-500"
             />
           </div>
           <div>
@@ -83,7 +83,7 @@ export function GoalsSection({ onGoalCreated }: { onGoalCreated?: () => void }) 
               value={targetAmount}
               onChange={(e) => setTargetAmount(e.target.value)}
               placeholder="500"
-              className="w-full bg-[#0D0D1A] border border-[#1E1E3F] rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-purple-500"
+              className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-800 focus:outline-none focus:border-purple-500"
             />
           </div>
           <button
@@ -98,7 +98,7 @@ export function GoalsSection({ onGoalCreated }: { onGoalCreated?: () => void }) 
 
       {/* Lista de metas */}
       {goalsArr.length === 0 ? (
-        <div className="text-center py-6 text-gray-600 text-sm">
+        <div className="text-center py-6 text-gray-400 text-sm">
           <p>No tienes metas aún.</p>
           <p className="text-xs mt-1">Las metas te ayudan a ahorrar con propósito.</p>
         </div>
@@ -117,7 +117,7 @@ export function GoalsSection({ onGoalCreated }: { onGoalCreated?: () => void }) 
             const emoji = GOAL_EMOJIS[i % GOAL_EMOJIS.length];
 
             return (
-              <div key={i} className="bg-[#0D0D1A] rounded-xl p-4">
+              <div key={i} className="bg-gray-50 rounded-xl p-4">
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <span className="text-xl">{emoji}</span>
@@ -141,7 +141,7 @@ export function GoalsSection({ onGoalCreated }: { onGoalCreated?: () => void }) 
                 <div className="w-full bg-[#1E1E3F] rounded-full h-1.5">
                   <div
                     className={`h-1.5 rounded-full transition-all ${
-                      completed ? "bg-green-500" : "bg-gradient-to-r from-purple-600 to-violet-400"
+                      completed ? "bg-green-500" : "bg-gradient-to-r from-violet-500 to-purple-400"
                     }`}
                     style={{ width: `${pct}%` }}
                   />
