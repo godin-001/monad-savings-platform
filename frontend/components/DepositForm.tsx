@@ -159,7 +159,7 @@ export function DepositForm({ onSuccess }: { onSuccess?: () => void }) {
       </div>
 
       {/* Meta (opcional) */}
-      {goals && (goals as Goal[]).filter((g) => g.active).length > 0 && (
+      {goals && (goals as unknown as Goal[]).filter((g) => g.active).length > 0 && (
         <div>
           <label className="block text-sm font-medium text-gray-400 mb-1.5">
             Meta de ahorro (opcional)
@@ -170,7 +170,7 @@ export function DepositForm({ onSuccess }: { onSuccess?: () => void }) {
             className="w-full bg-[#0D0D1A] border border-[#1E1E3F] rounded-lg px-4 py-3 text-sm text-gray-200 focus:outline-none focus:border-purple-500 transition-colors"
           >
             <option value={0}>Sin meta específica</option>
-            {(goals as Goal[]).map((goal, i) =>
+            {(goals as unknown as Goal[]).map((goal, i) =>
               goal.active ? (
                 <option key={i} value={i + 1}>
                   {goal.name} ({formatUnits(goal.savedAmount, 18)}/

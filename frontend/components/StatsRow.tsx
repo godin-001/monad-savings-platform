@@ -24,7 +24,7 @@ export function StatsRow() {
     query: { enabled: !!address },
   });
 
-  const posArr = (positions as Position[]) ?? [];
+  const posArr = (positions as unknown as Position[]) ?? [];
 
   const totalDeposited = posArr
     .filter((p) => !p.claimed)

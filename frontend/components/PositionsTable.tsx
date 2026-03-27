@@ -43,7 +43,7 @@ export function PositionsTable() {
 
   const now = Math.floor(Date.now() / 1000);
 
-  if (!positions || (positions as Position[]).length === 0) {
+  if (!positions || (positions as unknown as Position[]).length === 0) {
     return (
       <div className="bg-[#13132A] border border-[#1E1E3F] rounded-2xl p-8 text-center text-gray-500">
         <div className="text-4xl mb-3">📭</div>
@@ -71,7 +71,7 @@ export function PositionsTable() {
             </tr>
           </thead>
           <tbody className="divide-y divide-[#1E1E3F]">
-            {(positions as Position[]).map((pos, i) => {
+            {(positions as unknown as Position[]).map((pos, i) => {
               const isMatured = now >= Number(pos.maturityTime);
               const tier = APY_CONFIG.find((t) => t.days === Number(pos.lockPeriodDays));
               const maturityDate = new Date(Number(pos.maturityTime) * 1000);

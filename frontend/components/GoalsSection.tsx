@@ -47,7 +47,7 @@ export function GoalsSection({ onGoalCreated }: { onGoalCreated?: () => void }) 
     });
   };
 
-  const goalsArr = (goals as Goal[]) ?? [];
+  const goalsArr = (goals as unknown as Goal[]) ?? [];
 
   const GOAL_EMOJIS = ["🎯", "✈️", "🏠", "💻", "🚗", "🎓", "💍", "🌎", "🏋️", "🎵"];
 
