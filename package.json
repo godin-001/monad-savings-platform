@@ -1,0 +1,10 @@
+{
+  "name": "monad-savings-platform",
+  "private": true,
+  "workspaces": ["frontend"],
+  "scripts": {
+    "dev": "yarn workspace monad-savings-frontend dev",
+    "build": "yarn workspace monad-savings-frontend build",
+    "start": "yarn workspace monad-savings-frontend start"
+  }
+}
