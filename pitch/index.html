@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Monad Savings — Pitch Deck</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --orange: #F97316;
+    --orange-light: #FED7AA;
+    --violet: #7C3AED;
+    --violet-light: #EDE9FE;
+    --white: #FFFFFF;
+    --gray-900: #111827;
+    --gray-600: #4B5563;
+    --gray-400: #9CA3AF;
+    --bg: #F8F7FF;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0f0f0f;
+    color: var(--gray-900);
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  /* ── SLIDES ── */
+  .deck { width: 100vw; height: 100vh; position: relative; }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 5vw;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
+  .slide.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* ── SLIDE BACKGROUNDS ── */
+  .slide-cover   { background: linear-gradient(135deg, #F97316 0%, #9333EA 60%, #4C1D95 100%); color: white; }
+  .slide-problem { background: #0f0f0f; color: white; }
+  .slide-solution{ background: var(--bg); }
+  .slide-model   { background: white; }
+  .slide-traction{ background: linear-gradient(135deg, #FFF7ED 0%, #EDE9FE 100%); }
+  .slide-cta     { background: linear-gradient(135deg, #F97316 0%, #7C3AED 100%); color: white; }
+
+  /* ── TYPOGRAPHY ── */
+  .eyebrow {
+    font-size: clamp(0.7rem, 1.5vw, 0.9rem);
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 1rem;
+  }
+  h1 { font-size: clamp(2.5rem, 7vw, 5.5rem); font-weight: 900; line-height: 1.0; letter-spacing: -0.03em; }
+  h2 { font-size: clamp(1.8rem, 4vw, 3.2rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; }
+  h3 { font-size: clamp(1rem, 2vw, 1.4rem); font-weight: 700; margin-bottom: 0.4rem; }
+  p  { font-size: clamp(0.85rem, 1.8vw, 1.15rem); line-height: 1.6; opacity: 0.8; }
+
+  .highlight-orange { color: #F97316; }
+  .highlight-violet { color: #7C3AED; }
+  .highlight-white  { color: white; }
+
+  /* ── SLIDE 1: COVER ── */
+  .cover-logo {
+    width: clamp(60px, 10vw, 100px);
+    height: clamp(60px, 10vw, 100px);
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    border: 3px solid rgba(255,255,255,0.4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 900;
+    color: white;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(10px);
+  }
+  .cover-tagline {
+    font-size: clamp(1rem, 2.2vw, 1.4rem);
+    opacity: 0.85;
+    margin-top: 1.5rem;
+    font-style: italic;
+    max-width: 700px;
+    text-align: center;
+  }
+  .cover-badge {
+    margin-top: 2.5rem;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 999px;
+    padding: 0.5rem 1.5rem;
+    font-size: clamp(0.75rem, 1.5vw, 0.9rem);
+    backdrop-filter: blur(10px);
+  }
+
+  /* ── SLIDE 2: PROBLEM ── */
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+    width: 100%;
+    max-width: 1000px;
+  }
+  .problem-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    text-align: center;
+  }
+  .problem-card .emoji { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 0.75rem; }
+  .problem-card p { font-size: clamp(0.75rem, 1.5vw, 0.95rem); opacity: 0.7; color: white; }
+  .problem-stat {
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 900;
+    color: #F97316;
+    line-height: 1;
+  }
+
+  /* ── SLIDE 3: SOLUTION ── */
+  .solution-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    width: 100%;
+    max-width: 1100px;
+    align-items: center;
+  }
+  .apy-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .apy-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: white;
+    border-radius: 1rem;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    border: 2px solid transparent;
+  }
+  .apy-card.orange { border-color: #F97316; }
+  .apy-card.violet { border-color: #7C3AED; }
+  .apy-card.green  { border-color: #22C55E; }
+  .apy-label { font-weight: 600; font-size: clamp(0.85rem, 1.8vw, 1.05rem); color: #374151; }
+  .apy-value { font-size: clamp(1.5rem, 3vw, 2.2rem); font-weight: 900; }
+  .apy-card.orange .apy-value { color: #F97316; }
+  .apy-card.violet .apy-value { color: #7C3AED; }
+  .apy-card.green  .apy-value { color: #22C55E; }
+
+  /* ── SLIDE 4: MODEL ── */
+  .model-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-top: 2rem;
+    width: 100%;
+    max-width: 900px;
+  }
+  .model-card {
+    background: var(--bg);
+    border: 2px solid #E5E7EB;
+    border-radius: 1rem;
+    padding: 1.5rem;
+  }
+  .model-card .icon { font-size: 2rem; margin-bottom: 0.75rem; }
+  .model-card h3 { color: var(--gray-900); }
+  .model-card p { font-size: clamp(0.75rem, 1.5vw, 0.9rem); color: var(--gray-600); }
+  .fee-pill {
+    display: inline-block;
+    background: linear-gradient(135deg, #FED7AA, #FDE68A);
+    border-radius: 999px;
+    padding: 0.3rem 1rem;
+    font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+    font-weight: 900;
+    color: #92400E;
+    margin: 0.5rem 0;
+  }
+
+  /* ── SLIDE 5: TRACTION ── */
+  .traction-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin: 2.5rem 0;
+    width: 100%;
+    max-width: 1000px;
+  }
+  .traction-card {
+    background: white;
+    border-radius: 1.25rem;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
+  .traction-num {
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+  .traction-card p { font-size: clamp(0.7rem, 1.4vw, 0.85rem); }
+  .stack-pills {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 1.5rem;
+  }
+  .pill {
+    background: var(--violet-light);
+    color: var(--violet);
+    border-radius: 999px;
+    padding: 0.35rem 1rem;
+    font-size: clamp(0.7rem, 1.4vw, 0.85rem);
+    font-weight: 600;
+  }
+  .pill.orange { background: #FED7AA; color: #9A3412; }
+
+  /* ── SLIDE 6: CTA ── */
+  .cta-url {
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 1rem;
+    padding: 1rem 2rem;
+    font-size: clamp(1rem, 2.5vw, 1.6rem);
+    font-weight: 700;
+    margin: 1.5rem 0 0.75rem;
+    backdrop-filter: blur(10px);
+  }
+  .cta-github {
+    font-size: clamp(0.8rem, 1.8vw, 1.1rem);
+    opacity: 0.7;
+    margin-bottom: 2rem;
+  }
+
+  /* ── NAVIGATION ── */
+  .nav {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    z-index: 100;
+  }
+  .nav-btn {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    border-radius: 999px;
+    padding: 0.5rem 1.5rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+    transition: background 0.2s;
+  }
+  .nav-btn:hover { background: rgba(255,255,255,0.3); }
+  .nav-dots {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.35);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .dot.active { background: white; transform: scale(1.3); }
+
+  /* ── SLIDE NUMBER ── */
+  .slide-num {
+    position: fixed;
+    top: 1.5rem;
+    right: 2rem;
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.5);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    z-index: 100;
+  }
+
+  /* ── COMPARISON TABLE (slide 3) ── */
+  .compare-table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+  .compare-table th {
+    padding: 0.6rem 1rem;
+    font-size: clamp(0.75rem, 1.5vw, 0.9rem);
+    font-weight: 700;
+    text-align: left;
+  }
+  .compare-table td {
+    padding: 0.5rem 1rem;
+    font-size: clamp(0.7rem, 1.4vw, 0.85rem);
+    border-top: 1px solid #F3F4F6;
+  }
+  .bad  { color: #9CA3AF; }
+  .good { color: #111827; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- SLIDE 1: PORTADA -->
+  <div class="slide slide-cover active">
+    <div class="cover-logo">M</div>
+    <div class="eyebrow" style="color:rgba(255,255,255,0.7)">Hackathon Monad 2026</div>
+    <h1 style="text-align:center; max-width:800px;">
+      Monad<br/>Savings
+    </h1>
+    <p class="cover-tagline">
+      "En un seguro comercial confías en una empresa.<br/>
+      Aquí confías en el código — y el código no miente."
+    </p>
+    <div class="cover-badge">
+      DeFi · Ahorro · LATAM · Monad Testnet
+    </div>
+  </div>
+
+  <!-- SLIDE 2: PROBLEMA -->
+  <div class="slide slide-problem">
+    <div style="text-align:center; max-width:1000px; width:100%;">
+      <div class="eyebrow" style="color:#F97316;">El problema</div>
+      <h2 style="color:white;">Los jóvenes de LATAM quieren ahorrar.<br/>El sistema les falla.</h2>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="problem-stat">40%</div>
+          <p>de comisiones ocultas en seguros de ahorro, en letra pequeña del año 5</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-stat">20</div>
+          <p>años de compromiso mínimo en muchos productos de ahorro tradicionales</p>
+        </div>
+        <div class="problem-card">
+          <div class="problem-stat">3%</div>
+          <p>APY promedio que da un banco — la inflación lo supera fácilmente</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: SOLUCIÓN -->
+  <div class="slide slide-solution">
+    <div style="max-width:1100px; width:100%;">
+      <div class="eyebrow" style="color:#F97316;">La solución</div>
+      <h2>Ahorro en blockchain.<br/><span class="highlight-orange">Transparente. Sin banco. Sin trampa.</span></h2>
+      <div class="solution-split" style="margin-top:2rem;">
+        <div>
+          <table class="compare-table">
+            <thead>
+              <tr>
+                <th style="color:#EF4444;">❌ Seguro comercial</th>
+                <th style="color:#22C55E;">✅ Monad Savings</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td class="bad">Comisiones ocultas 15–40%</td><td class="good">10% del yield, visible</td></tr>
+              <tr><td class="bad">Contratos 5–20 años</td><td class="good">30, 60 o 90 días</td></tr>
+              <tr><td class="bad">RFC, comprobante, historial</td><td class="good">Solo una wallet</td></tr>
+              <tr><td class="bad">Tasa cambia sin avisar</td><td class="good">Tasa inmutable en contrato</td></tr>
+              <tr><td class="bad">3–4% APY</td><td class="good">Hasta 20% APY fijo</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="apy-cards">
+          <div class="apy-card green">
+            <div><div class="apy-label">🌱 30 días</div><div style="font-size:0.8rem;color:#6B7280;">Para empezar</div></div>
+            <div class="apy-value">5%</div>
+          </div>
+          <div class="apy-card violet">
+            <div><div class="apy-label">🔥 60 días</div><div style="font-size:0.8rem;color:#6B7280;">El más popular</div></div>
+            <div class="apy-value">12%</div>
+          </div>
+          <div class="apy-card orange">
+            <div><div class="apy-label">💎 90 días</div><div style="font-size:0.8rem;color:#6B7280;">Máximo rendimiento</div></div>
+            <div class="apy-value">20%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: MODELO DE NEGOCIO -->
+  <div class="slide slide-model">
+    <div style="max-width:900px; width:100%; text-align:center;">
+      <div class="eyebrow" style="color:#F97316;">Modelo de negocio</div>
+      <h2>Simple. Alineado. Sin letra pequeña.</h2>
+      <div class="model-grid">
+        <div class="model-card">
+          <div class="icon">💰</div>
+          <h3>Fee de rendimiento</h3>
+          <div class="fee-pill">10% del yield</div>
+          <p>Solo sobre lo ganado, nunca sobre el capital. El usuario lo ve antes de depositar.</p>
+        </div>
+        <div class="model-card">
+          <div class="icon">🚀</div>
+          <h3>Roadmap: Yield Spread</h3>
+          <p>Optimización de yield entre múltiples protocolos. La diferencia queda en el protocolo.</p>
+        </div>
+        <div class="model-card">
+          <div class="icon">🎯</div>
+          <h3>Metas on-chain</h3>
+          <p>Ahorro con propósito nombrado. Progreso visible. Diferenciador vs. ahorro abstracto.</p>
+        </div>
+        <div class="model-card">
+          <div class="icon">🔥</div>
+          <h3>Savings Streaks</h3>
+          <p>Rachas de depósitos gamificadas. Futuro: APY premium para usuarios constantes.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: TRACCIÓN TÉCNICA -->
+  <div class="slide slide-traction">
+    <div style="max-width:1000px; width:100%; text-align:center;">
+      <div class="eyebrow" style="color:#F97316;">Lo que ya construimos</div>
+      <h2>Deployado. Testeado. En vivo.</h2>
+      <div class="traction-grid">
+        <div class="traction-card">
+          <div class="traction-num" style="color:#F97316;">18/18</div>
+          <p>Tests pasando en Foundry</p>
+        </div>
+        <div class="traction-card">
+          <div class="traction-num" style="color:#7C3AED;">100K</div>
+          <p>mUSDC en el yield pool</p>
+        </div>
+        <div class="traction-card">
+          <div class="traction-num" style="color:#22C55E;">20%</div>
+          <p>APY máximo verificable on-chain</p>
+        </div>
+        <div class="traction-card">
+          <div class="traction-num" style="color:#F97316;">0</div>
+          <p>Comisiones ocultas. Ninguna.</p>
+        </div>
+      </div>
+      <div class="stack-pills">
+        <span class="pill">Solidity 0.8.24</span>
+        <span class="pill">Foundry</span>
+        <span class="pill orange">Monad Testnet</span>
+        <span class="pill">Next.js 14</span>
+        <span class="pill">wagmi v2</span>
+        <span class="pill">RainbowKit</span>
+        <span class="pill orange">Chain ID 10143</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: CTA -->
+  <div class="slide slide-cta">
+    <div class="eyebrow" style="color:rgba(255,255,255,0.7);">Pruébalo ahora</div>
+    <h1 style="text-align:center; max-width:800px;">
+      El código<br/>es la ley.
+    </h1>
+    <div class="cta-url">
+      🌐 facing-ready-demand-edgar.trycloudflare.com
+    </div>
+    <div class="cta-github">
+      github.com/godin-001/monad-savings-platform
+    </div>
+    <p style="opacity:0.6; font-size:clamp(0.75rem,1.5vw,0.9rem); text-align:center; max-width:500px;">
+      Contratos desplegados en Monad Testnet · Chain ID 10143<br/>
+      SavingsVault: 0x95dDd45...F5
+    </p>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- Slide number -->
+<div class="slide-num" id="slideNum">1 / 6</div>
+
+<!-- Navigation -->
+<div class="nav">
+  <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+  <div class="nav-dots" id="dots"></div>
+  <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  // Build dots
+  const dotsEl = document.getElementById('dots');
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
+  });
+
+  function goTo(n) {
+    slides[current].classList.remove('active');
+    dotsEl.children[current].classList.remove('active');
+    current = (n + total) % total;
+    slides[current].classList.add('active');
+    dotsEl.children[current].classList.add('active');
+    document.getElementById('slideNum').textContent = (current + 1) + ' / ' + total;
+  }
+
+  function changeSlide(dir) { goTo(current + dir); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') changeSlide(1);
+    if (e.key === 'ArrowLeft') changeSlide(-1);
+  });
+</script>
+</body>
+</html>
