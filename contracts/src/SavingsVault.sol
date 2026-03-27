@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
+// ─── Interfaces ───────────────────────────────────────────────────────────────
+
+interface IERC20 {
+    function transferFrom(address from, address to, uint256 amount) external returns (bool);
+    function transfer(address to, uint256 amount) external returns (bool);
+    function balanceOf(address account) external view returns (uint256);
+}
+
 /// @title SavingsVault — Monad Savings Platform
 /// @notice Ahorro a plazo fijo con rendimiento transparente para la generación 20-35.
 ///         Sin comisiones ocultas, sin KYC, sin intermediarios. Solo el código.
 contract SavingsVault {
-    // ─── Interfaces ──────────────────────────────────────────────────────────
-
-    interface IERC20 {
-        function transferFrom(address from, address to, uint256 amount) external returns (bool);
-        function transfer(address to, uint256 amount) external returns (bool);
-        function balanceOf(address account) external view returns (uint256);
-    }
-
     // ─── Types ───────────────────────────────────────────────────────────────
 
     struct Position {

@@ -2,8 +2,8 @@
 // Actualizar después del deploy en Monad Testnet
 
 export const CONTRACT_ADDRESSES = {
-  savingsVault: "0x0000000000000000000000000000000000000000" as `0x${string}`,
-  mockUSDC: "0x0000000000000000000000000000000000000000" as `0x${string}`,
+  savingsVault: "0x95dDd45079B5646e545495C0E8abAD0d5CCf43F5" as `0x${string}`,
+  mockUSDC: "0x438098d0d769e328F26A272b57Ad5d87AC8CC65E" as `0x${string}`,
 };
 
 // ─── SavingsVault ABI ─────────────────────────────────────────────────────────
