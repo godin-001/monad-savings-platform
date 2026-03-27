@@ -18,7 +18,13 @@ const config: Config = {
           card:    "#FFFFFF",
           border:  "#E5E7EB",
           muted:   "#6B7280",
+          orange:  "#F97316",
+          amber:   "#FB923C",
         },
+      },
+      fontSize: {
+        "hero":   ["5.5rem", { lineHeight: "1.05", letterSpacing: "-0.03em" }],
+        "hero-md":["7rem",   { lineHeight: "1.02", letterSpacing: "-0.04em" }],
       },
     },
   },
